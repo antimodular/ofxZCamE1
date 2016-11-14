@@ -1,0 +1,1 @@
+OpenFrameworks addon to use the API of the Z Camera model E1 (http://z-cam.com/)
