@@ -1,0 +1,3 @@
+ofxHTTP
+ofxJSON
+ofxZCamE1
