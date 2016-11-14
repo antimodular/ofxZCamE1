@@ -26,6 +26,11 @@ void ofxZCamE1::loadAPI(string section)
 	ofDirectory dir(path);
 	dir.allowExt("json");
 	dir.listDir();
+	
+	if (dir.size() == 0) {
+		ofLogFatalError() << "Missing api files from the bin/data folder; check ofxZCamE1 doc." << endl;
+		std::exit(1);
+	}
 
 	for (int i = 0; i < dir.size(); i++) {
 		if (! result.open( string(dir.getPath(i)) ) ) continue;
