@@ -5,6 +5,6 @@
 
 #### Instructions :
 1. Configure using the projectGenerator.
-2. Copy addons/ofxZCamE1/bin/data/api to bin/data/api
+2. Copy "addons/ofxZCamE1/bin/data/zcam/" to application "bin/data/"
 3. Compile and try...
 ⋅⋅* (A wifi connection to the ZCam is required)

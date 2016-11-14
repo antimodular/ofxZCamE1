@@ -22,14 +22,14 @@ void ofxZCamE1::loadAPI(string section)
 	ofLogNotice() << "Loading ZCam API section : \"" << section << "\"..." << endl;
 
 	ofxJSONElement result;
-	string path = "api/"+section;
+	string path = "zcam/api/"+section;
 	ofDirectory dir(path);
 	dir.allowExt("json");
 	dir.listDir();
 	
 	if (dir.size() == 0) {
 		ofLogFatalError() << "Missing api files from the bin/data folder; check ofxZCamE1 doc." << endl;
-		std::exit(1);
+		exit(1);
 	}
 
 	for (int i = 0; i < dir.size(); i++) {
@@ -151,7 +151,7 @@ void ofxZCamE1::sendSettings()
 
 bool ofxZCamE1::saveSettings() // save all settings
 {
-	string path = "settings.json";
+	string path = "zcam/settings.json";
 	bool success = this->settings.save(path, true);
 	if (success)
 		ofLogNotice("ofxZCamE1::saveSettings") << path << " successfully saved.";
@@ -163,7 +163,7 @@ bool ofxZCamE1::saveSettings() // save all settings
 
 bool ofxZCamE1::loadSettings() // load saved settings
 {
-	string path = "settings.json";
+	string path = "zcam/settings.json";
 	bool success = this->settings.open(path);
 	if (success)
 		ofLogNotice("ofxZCamE1::loadSettings") << path << " successfully loaded.";
