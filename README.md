@@ -4,7 +4,10 @@
 * Can only get, send, save and load settings. 
 
 #### TODO:
-* Complete the API and the sample application
+* Complete the API and the sample application.
+
+#### Dependencies:
+* [ofxJSON](https://github.com/jefftimesten/ofxJSON)
 
 ### Notes: 
 * Developed using (incomplete) info from the [api documentation]
