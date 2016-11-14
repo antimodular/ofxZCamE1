@@ -1,0 +1,11 @@
+{
+  "key": "photo_q",
+  "opts": [
+    "Basic",
+    "Fine",
+    "S.Fine",
+    "JPEG + DNG"
+  ],
+  "ro": 0,
+  "type": 1
+}

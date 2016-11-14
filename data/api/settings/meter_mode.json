@@ -1,0 +1,10 @@
+{
+  "key": "meter_mode",
+  "opts": [
+    "Center",
+    "Average",
+    "Spot"
+  ],
+  "ro": 0,
+  "type": 1
+}

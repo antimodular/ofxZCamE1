@@ -1,0 +1,10 @@
+{
+  "key": "caf_sens",
+  "opts": [
+    "High",
+    "Middle",
+    "Low"
+  ],
+  "ro": 0,
+  "type": 1
+}

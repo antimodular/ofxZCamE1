@@ -1,0 +1,10 @@
+{
+  "key": "drive_mode",
+  "opts": [
+    "single",
+    "continuous",
+    "time_lapse"
+  ],
+  "ro": 0,
+  "type": 1
+}

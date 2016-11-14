@@ -1,0 +1,8 @@
+{
+  "key": "brightness",
+  "max": 256,
+  "min": -256,
+  "ro": 0,
+  "step": 1,
+  "type": 2
+}

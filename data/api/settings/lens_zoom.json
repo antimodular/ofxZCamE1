@@ -1,0 +1,10 @@
+{
+  "key": "lens_zoom",
+  "opts": [
+    "stop",
+    "in",
+    "out"
+  ],
+  "ro": 0,
+  "type": 1
+}
