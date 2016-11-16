@@ -31,7 +31,7 @@ void ofApp::draw()
     info << "Press 'h' to zoom to 1/3." << endl;
     info << "Press 'j' to zoom to 2/3.\n" << endl;
 
-    info << "Press 'f' to focus to center." << endl;
+    info << "Press 'f' to focus on center." << endl;
 
     ofDrawBitmapStringHighlight(info.str(), 50, 50);
 	
