@@ -9,10 +9,9 @@ class ofApp : public ofBaseApp{
         ofxZCamE1 zcam;
     
         void setup();
-		void update();
-		void draw();
+        void update();
+        void draw();
         void exit();
-
-		void keyPressed(int key);
+        void keyPressed(int key);
 
 };
