@@ -1,7 +1,8 @@
 ### OpenFrameworks addon to use the API of the [Z Camera model E1](http://z-cam.com/)
 
 #### Status:
-* Can only get, send, save and load settings. 
+* Can only get, send, save and load settings.
+* Tested with of_0.9.7, on OSX, Linux and Windows
 
 #### TODO:
 * Complete the API and the sample application.
