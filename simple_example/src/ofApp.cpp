@@ -6,7 +6,7 @@
 
 void ofApp::setup()
 {
-    ofSetWindowShape(400, 300);
+    ofSetWindowShape(400, 350);
 
 	if (! zcam.init()) {
 		ofLogFatalError("Instance of ofxZCamE1 is not ready.");
@@ -41,9 +41,13 @@ void ofApp::draw()
     info << "Press 'h' to zoom to 1/3." << endl;
     info << "Press 'j' to zoom to 2/3.\n" << endl;
 
-    info << "Press 'f' to focus on center." << endl;
+    info << "Press 'f' to focus on center.\n" << endl;
+    
+    info << "Press 'w' to set ev to -3.0." << endl;
+    info << "Press 'e' to set ev to 0.0." << endl;
+    info << "Press 'r' to set ev to 3.0." << endl;
 
-    ofDrawBitmapStringHighlight(info.str(), 50, 50);
+    ofDrawBitmapStringHighlight(info.str(), 40, 40);
 	
 	ofxJSONElement setting;
 	ofxJSONElement settings_api = zcam.api["settings"]; 
@@ -91,6 +95,17 @@ void ofApp::keyPressed(int key)
         case 'j': // zoom to 2/3
 			zcam.zoom_in(0.66);
             break;
+            
+        case 'w': // zoom to 2/3
+			zcam.set_ev(-3.0);
+            break;
+        case 'e': // zoom to 2/3
+			zcam.set_ev(0.0);
+            break;
+        case 'r': // zoom to 2/3
+			zcam.set_ev(3.0);
+            break;
+            
         default:
             break;
     }

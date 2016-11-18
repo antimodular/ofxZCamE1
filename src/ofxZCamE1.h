@@ -41,6 +41,9 @@ class ofxZCamE1: public ofThread, Json::Value
 		bool saveSettings(); // save all settings from ZCam		
 		bool loadSettings(); // load saved settings to ZCam
 
+		/*  ev */
+		bool set_ev(float ev, bool thread=true);
+		
 		/* Focus at position */
 		bool send_focus_pos(string focus_pos); // rectangle id
 		bool focus_at(float x, float y, bool thread=true); // values between 0 and 1

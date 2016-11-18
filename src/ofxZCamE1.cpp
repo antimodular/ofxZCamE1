@@ -324,7 +324,7 @@ bool ofxZCamE1::zoom_in(float zoom, bool thread) { // 0 = full out, 1 = full in
 		);
 		return true;
 	}
-	
+
 	// contrain x and y between 0 and 1
 	if (zoom < 0.0) zoom = 0.0;
 	if (zoom > 1.0) zoom = 1.0;
@@ -357,5 +357,23 @@ bool ofxZCamE1::zoom_in(float zoom, bool thread) { // 0 = full out, 1 = full in
 
 };
 
+
+bool ofxZCamE1::set_ev(float ev, bool thread) {
+	
+	if (thread) {
+		this->fl.insert(this->fl.begin(), 
+			bind(&ofxZCamE1::set_ev, this, ev, false)
+		);
+		return true;
+	}
+	
+	if (ev < -3.0) ev = -3.0;
+	if (ev >  3.0) ev =  3.0;
+	
+	string evh = to_string(int(round(32*ev)));
+	ofLogNotice("set ev to ") << ev << " (" << evh << ")";
+	this->settings["ev"] = evh;
+	return sendSetting("ev", evh);
+};
 
 
