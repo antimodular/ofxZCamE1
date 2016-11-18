@@ -4,18 +4,28 @@
 void ofApp::setup()
 {
     ofSetWindowShape(400, 300);
-    zcam.setup();
+    
     zcam.full_zoom_time = 2800; // may depend on the lens
+
+	if (! zcam.init()) {
+		ofLogFatalError("Instance of ofxZCamE1 is not ready.");
+		//~ exit();
+	}
+		
+    zcam.setup();
 }
 //--------------------------------------------------------------
 void ofApp::update()
 {
-
+	
 }
 //--------------------------------------------------------------
 void ofApp::draw()
 {
-    ofSetBackgroundColor(ofColor(0,0,0));
+	if (zcam.flist.empty())
+		ofSetBackgroundColor(ofColor(0,0,0));
+	else
+		ofSetBackgroundColor(ofColor(127,127,127));
 
     stringstream info;
     info << "Simple example for the ZCamE1 addon." << endl;
@@ -38,13 +48,13 @@ void ofApp::draw()
 	ofxJSONElement setting;
 	ofxJSONElement settings_api = zcam.api["settings"]; 
 	ofxJSONElement keys = zcam.api["settings"]["keys"];
-	string key;
+	//~ string key;
     
 }
 
 void ofApp::exit()
 {
-    zcam.session(0);
+    zcam.session(false);
 }
 
 //--------------------------------------------------------------
@@ -57,15 +67,12 @@ void ofApp::keyPressed(int key)
             break;
         case 'l': // load all saved settings
 			zcam.loadSettings();
-            cout << zcam.settings << endl;
             break;
         case 'g': // get all settings from ZCam
 			zcam.getSettings();
-            cout << zcam.settings << endl;
             break;
         case 's': // send all settings to ZCam
 			zcam.sendSettings();
-            break;
             break;
         case 'f': // focus to center
 			zcam.focus_at(0.5, 0.5);

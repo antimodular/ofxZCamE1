@@ -1,43 +1,50 @@
 #include "ofMain.h"
 #include "ofxJSON.h"
 
-#include <chrono>
-#include <thread>
+#include <iostream>
+#include <vector>
+
+typedef std::vector<std::function<void(void)>> function_list;
 
 
-class ofxZCamE1 : public Json::Value {
+class ofxZCamE1: public ofThread, Json::Value 
+{
     
     public:
+		bool init();
+		bool ready = false;
+		
         void setup();
 
-		void loadAPI(string section); // get api structure
+		void threadedFunction();
+		function_list flist;
+
+		bool loadAPI(string section); // get api structure
 
         ofxJSONElement apiCall(string call); // http request to the ZCam
-        bool session(bool activate=1); // session control
+        bool session(bool activate=1, bool thread=false); // session control
         bool getInfo(); // get info about ZCam
 
         ofxJSONElement api; // api structure
-
-
-        /* Settings */
+        
         ofxJSONElement settings; // settings
 
-		ofxJSONElement getSetting(string setting); // get one setting from ZCam
-		bool sendSetting(string setting, string value); // sed one setting to ZCam
+		ofxJSONElement getSetting(string setting, bool thread=true); // get one setting from ZCam
+		bool sendSetting(string setting, string value, bool thread=true); // sed one setting to ZCam
 
-		void getSettings();  // get all settings from ZCam
-		void sendSettings(); // send all settings to ZCam		
+		void getSettings(bool thread=true);  // get all settings from ZCam
+		void sendSettings(bool thread=true); // send all settings to ZCam		
 		bool saveSettings(); // save all settings from ZCam		
 		bool loadSettings(); // load saved settings to ZCam
 
 		/* Focus at position */
 		bool send_focus_pos(string focus_pos); // rectangle id
-		bool focus_at(float x, float y); // values between 0 and 1
+		bool focus_at(float x, float y, bool thread=true); // values between 0 and 1
 
 		/* Zoom; time based zoom in from full zoom out (0 to 1) */
 		uint64_t full_zoom_time = 2800; // default value
 		void sleep_for(uint64_t delay); // wrapper for milliseconds sleep
-		bool zoom_in(float zoom); // 0 to 1
+		bool zoom_in(float zoom, bool thread=true); // 0 to 1
 
 
     private:
@@ -57,5 +64,12 @@ class ofxZCamE1 : public Json::Value {
 		};
 
 };
+
+
+//~ class ofxZCamE1Settings: public ofxZCamE1
+//~ {
+	//~ public:
+		//~ void threadedFunction();    
+//~ };
 
 
