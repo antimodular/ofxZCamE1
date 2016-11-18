@@ -30,7 +30,7 @@ void ofxZCamE1::threadedFunction() {
     while(isThreadRunning())
     {
 		sleep(25); // give the software some air
-		//~ ofLogNotice("zzz...");
+
 		if (! this->connection) {
 			fl.clear();
 			continue;
@@ -42,11 +42,10 @@ void ofxZCamE1::threadedFunction() {
 			continue;
 		} else
 			seconds = 10 + int(ofGetElapsedTimef());
-			
+		
 		// activate session and auto re-init each 10 seconds, if required
-		if ( (seconds != lastseconds) && (seconds % 10) == 0 ) {
+		if ( this->fl.empty() && seconds != lastseconds && (seconds % 10) == 0 ) {
 			lastseconds = seconds;
-			//~ ofLogNotice("ping!") << seconds;
 			if (! this->session())
 				this->ready = false;
 			if (! this->ready) {
@@ -245,7 +244,7 @@ void ofxZCamE1::sendAllSettings(bool thread)
 
 	ofxJSONElement keys = this->api["settings"]["keys"];
 	string value;
-	
+
 	for (int i = 0; i < keys.size(); i++) {
 		if (keys[i] == null) continue;
 		string key = keys[i].asString();
@@ -256,25 +255,29 @@ void ofxZCamE1::sendAllSettings(bool thread)
 			
 		value = this->settings[key].asString();
 		if (value == "") {
-			ofLogError("setting has no value:") << key;
+			ofLogError("setting has no value") << key;
 			continue;
 		}
 		
-		if (!sendSetting(key, value, thread)) {
+		if (!sendSetting(key, value, thread))
 			ofLogError("error setting ") << key << "=" << value << " to ZCam.";
-		}
+		this->sleep(100);
 	}
-
+			
 	// send zoom
 	if (this->settings["zoom_in"] != null) {
 		float zoom_in_val = stof(this->settings["zoom_in"].asString());
-		zoom_in(zoom_in_val, thread);
+		zoom_in(zoom_in_val, false);
 	}
 
 	// must send focus twice; the zoom sets in, then focus occurs...
 	if (this->settings["focus_pos"] != null) {
 		value = this->settings["focus_pos"].asString();
+		
+		this->sleep(100);
 		send_focus_pos(value);
+		
+		this->sleep(100);
 		send_focus_pos(value);
 	}
 
@@ -357,6 +360,8 @@ void ofxZCamE1::sleep_for(uint64_t delay) {
 
 bool ofxZCamE1::zoom_in(float zoom, bool thread) { // 0 = full out, 1 = full in
 	
+	ofLogNotice("zoom_in") << zoom << ", " << thread;
+	
 	if (thread) {
 		this->fl.insert(this->fl.begin(), 
 			bind(&ofxZCamE1::zoom_in, this, zoom, false)
@@ -377,19 +382,13 @@ bool ofxZCamE1::zoom_in(float zoom, bool thread) { // 0 = full out, 1 = full in
 	if (! sendSetting("lens_zoom", "out", thread))
 		return false;
 
-	if (thread)
-		this->sleep(this->full_zoom_time + 500);
-	else
-		this->sleep_for(this->full_zoom_time + 500);
+	this->sleep(this->full_zoom_time + 500);
 
 	ofLogNotice("zooming in to ") << zoom << "...";
 	if (! sendSetting("lens_zoom", "in", thread))
 		return false;
 
-	if (thread)
-		this->sleep(int(round(this->full_zoom_time * zoom)));
-	else
-		this->sleep_for(uint64_t(round(this->full_zoom_time * zoom)));
+	this->sleep(int(round(this->full_zoom_time * zoom)));
 
 	ofLogNotice("zooming stopped.");
 	return sendSetting("lens_zoom", "stop", thread);

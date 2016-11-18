@@ -20,7 +20,7 @@ void ofApp::draw()
 	if (! zcam.connection)
 		ofSetBackgroundColor(ofColor(0,0,0));
 	else if (zcam.ready) {
-		if (zcam.fl.empty()) // not functions executing in the thread
+		if (zcam.fl.empty()) // no functions executing in the thread
 			ofSetBackgroundColor(ofColor(0,255,0));
 		else
 			ofSetBackgroundColor(ofColor(127,127,127));
