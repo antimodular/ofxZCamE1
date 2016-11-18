@@ -30,6 +30,7 @@ class ofxZCamE1: public ofThread, Json::Value
         ofxJSONElement api; // api structure
         
         ofxJSONElement settings; // settings
+        set<string> settings_skip_list; // settings to skip (set and send)
 
 		ofxJSONElement getSetting(string setting, bool thread=false); // get one setting from ZCam
 		void getSettings(bool thread=true);  // get all settings from ZCam

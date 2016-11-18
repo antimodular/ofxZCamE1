@@ -119,7 +119,13 @@ bool ofxZCamE1::session(bool activate, bool thread) {
 
 ofxJSONElement ofxZCamE1::getSetting(string key, bool thread)
 {
+	
 	ofxJSONElement json;
+	
+	if (settings_skip_list.find(key) != settings_skip_list.end()) {
+		ofLogNotice("skipping ") << key;
+		return json;
+	}
 	
 	if (thread) {
 		this->fl.insert(this->fl.begin(), 
@@ -152,8 +158,11 @@ void ofxZCamE1::getSettings(bool thread)
 	for (int i = 0; i < keys.size(); i++) {
 		if (keys[i] == null) continue;
 		string key = keys[i].asString();
+		if (settings_skip_list.find(key) != settings_skip_list.end()) {
+			ofLogNotice("skipping ") << key;
+			continue;
+		}
 		setting = getSetting(key, false);
-		//~ setting = getSetting(key);
 		if (setting == null)
 			ofLogError("Error getting ") << key << " from ZCam.";
 	}
@@ -163,6 +172,11 @@ void ofxZCamE1::getSettings(bool thread)
 
 bool ofxZCamE1::sendSetting(string key, string value, bool thread)
 {
+	if (settings_skip_list.find(key) != settings_skip_list.end()) {
+		ofLogNotice("skipping ") << key;
+		return false;
+	}
+	
 	if (thread) {
 		this->fl.insert(this->fl.begin(), 
 			bind(&ofxZCamE1::sendSetting, this, key, value, false)
