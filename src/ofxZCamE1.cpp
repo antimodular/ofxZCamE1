@@ -1,7 +1,8 @@
+/* OF addon to control the Z Camera E1 through Wifi  */
+/* © Antimodular Reasearch  */
+/* Marc Lavallée, 2016/11/18  */
+
 #include "ofxZCamE1.h"
-#include <time.h>
-//~ #include <iostream>
-//~ #include <vector>
 
 
 bool ofxZCamE1::init()
@@ -10,8 +11,6 @@ bool ofxZCamE1::init()
 		if (this->getInfo())
 			if (this->session())
 				this->ready = true;
-
-	//~ ofLogNotice("init? : ") << this->ready;
    	return this->ready;
 };
 
@@ -30,12 +29,11 @@ void ofxZCamE1::threadedFunction() {
     while(isThreadRunning())
     {
 		sleep(25);
-		if (this->flist.empty()) continue;
-		auto& f = this->flist.back();
+		if (this->fl.empty()) continue;
+		auto& f = this->fl.back();
 		f();
-		this->flist.pop_back();
+		this->fl.pop_back();
     }
-        
 };
 
 
@@ -66,12 +64,11 @@ bool ofxZCamE1::loadAPI(string section)
 
 ofxJSONElement ofxZCamE1::apiCall(string uri)
 {
-	ofHttpResponse response; 
 	ofxJSONElement json;
-	stringstream url;
 	
+	stringstream url;
 	url << base_url << uri;
-	response = ofLoadURL(url.str());
+	ofHttpResponse response = ofLoadURL(url.str());
 
     if ( response.status == 409 ) {
         session_is_active = false;
@@ -97,8 +94,8 @@ bool ofxZCamE1::getInfo() {
 bool ofxZCamE1::session(bool activate, bool thread) {
 
 	if (thread) {
-		this->flist.emplace_back(
-			std::bind(&ofxZCamE1::session, this, activate, false)
+		this->fl.insert(this->fl.begin(), 
+			bind(&ofxZCamE1::session, this, activate, false)
 		);
 		return true;
 	}
@@ -123,9 +120,10 @@ bool ofxZCamE1::session(bool activate, bool thread) {
 ofxJSONElement ofxZCamE1::getSetting(string key, bool thread)
 {
 	ofxJSONElement json;
+	
 	if (thread) {
-		this->flist.emplace_back(
-			std::bind(&ofxZCamE1::getSetting, this, key, false)
+		this->fl.insert(this->fl.begin(), 
+			bind(&ofxZCamE1::getSetting, this, key, false)
 		);
 		return json;
 	}
@@ -141,21 +139,21 @@ ofxJSONElement ofxZCamE1::getSetting(string key, bool thread)
 void ofxZCamE1::getSettings(bool thread)
 {
 	if (thread) {
-		this->flist.emplace_back(
-			std::bind(&ofxZCamE1::getSettings, this, false)
+		this->fl.insert(this->fl.begin(), 
+			bind(&ofxZCamE1::getSettings, this, false)
 		);
 		return;
 	}
 	
 	ofxJSONElement setting;
 	ofxJSONElement keys = this->api["settings"]["keys"];
-	string key;
 
 	ofLogNotice("Getting all settings from ZCam...");
 	for (int i = 0; i < keys.size(); i++) {
 		if (keys[i] == null) continue;
-		key = keys[i].asString();
+		string key = keys[i].asString();
 		setting = getSetting(key, false);
+		//~ setting = getSetting(key);
 		if (setting == null)
 			ofLogError("Error getting ") << key << " from ZCam.";
 	}
@@ -166,8 +164,8 @@ void ofxZCamE1::getSettings(bool thread)
 bool ofxZCamE1::sendSetting(string key, string value, bool thread)
 {
 	if (thread) {
-		this->flist.emplace_back(
-			std::bind(&ofxZCamE1::sendSetting, this, false)
+		this->fl.insert(this->fl.begin(), 
+			bind(&ofxZCamE1::sendSetting, this, key, value, false)
 		);
 		return true;
 	}
@@ -181,27 +179,34 @@ bool ofxZCamE1::sendSetting(string key, string value, bool thread)
 };
 
 
-void ofxZCamE1::sendSettings(bool thread)
+void ofxZCamE1::sendAllSettings(bool thread)
 {
 	if (thread) {
-		this->flist.emplace_back(
-			std::bind(&ofxZCamE1::sendSettings, this, false)
+		this->fl.insert(this->fl.begin(), 
+			bind(&ofxZCamE1::sendAllSettings, this, false)
 		);
 		return;
 	}
 
-	ofxJSONElement keys = this->api["settings"]["keys"];
-	string key, value;
-
 	ofLogNotice("Starting to send all settings to ZCam.");
+
+	ofxJSONElement keys = this->api["settings"]["keys"];
+	string value;
+	
 	for (int i = 0; i < keys.size(); i++) {
 		if (keys[i] == null) continue;
-		key = keys[i].asString();
+		string key = keys[i].asString();
 		if (key == "focus_pos" || key == "zoom_in") continue;
 
+		if (this->api["settings"][key]["ro"].asString() == "1") 
+			continue;
+			
 		value = this->settings[key].asString();
-		if (this->api["settings"][key]["ro"].asString() == "1") continue;
-		value = this->settings[key].asString();
+		if (value == "") {
+			ofLogError("setting has no value:") << key;
+			continue;
+		}
+		
 		if (!sendSetting(key, value, thread)) {
 			ofLogError("error setting ") << key << "=" << value << " to ZCam.";
 		}
@@ -209,8 +214,8 @@ void ofxZCamE1::sendSettings(bool thread)
 
 	// send zoom
 	if (this->settings["zoom_in"] != null) {
-		value = this->settings["zoom_in"].asString();
-		zoom_in(stof(value));
+		float zoom_in_val = stof(this->settings["zoom_in"].asString());
+		zoom_in(zoom_in_val, thread);
 	}
 
 	// must send focus twice; the zoom sets in, then focus occurs...
@@ -261,8 +266,8 @@ bool ofxZCamE1::send_focus_pos(string focus_pos) {
 bool ofxZCamE1::focus_at(float x, float y, bool thread) {
 		
 	if (thread) {
-		this->flist.emplace_back(
-			std::bind(&ofxZCamE1::focus_at, this, x, y, false)
+		this->fl.insert(this->fl.begin(), 
+			bind(&ofxZCamE1::focus_at, this, x, y, false)
 		);
 		return true;
 	}
@@ -285,6 +290,7 @@ bool ofxZCamE1::focus_at(float x, float y, bool thread) {
 	pos = int((ix + (iy * 15)));
 	focus_pos = this->focus_pos[pos];
 	this->settings["focus_pos"] = focus_pos;
+	
 	return send_focus_pos(focus_pos);
 };
 
@@ -299,13 +305,11 @@ void ofxZCamE1::sleep_for(uint64_t delay) {
 bool ofxZCamE1::zoom_in(float zoom, bool thread) { // 0 = full out, 1 = full in
 	
 	if (thread) {
-		this->flist.emplace_back(
-			std::bind(&ofxZCamE1::zoom_in, this, zoom, false)
+		this->fl.insert(this->fl.begin(), 
+			bind(&ofxZCamE1::zoom_in, this, zoom, false)
 		);
 		return true;
 	}
-
-	ofLogNotice("zooming to ") << zoom;
 	
 	// contrain x and y between 0 and 1
 	if (zoom < 0.0) zoom = 0.0;

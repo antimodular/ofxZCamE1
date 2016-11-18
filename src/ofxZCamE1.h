@@ -1,23 +1,25 @@
+/* OF addon to control the Z Camera E1 through Wifi  */
+/* © Antimodular Reasearch  */
+/* Marc Lavallée, 2016/11/18  */
+
 #include "ofMain.h"
 #include "ofxJSON.h"
+#include <time.h>
 
-#include <iostream>
-#include <vector>
-
-typedef std::vector<std::function<void(void)>> function_list;
+// function queue for thread loop
+// http://stackoverflow.com/questions/13108663/storing-functions-call-and-list-of-parameters-to-invoke-later
+typedef vector<function<void(void)>> function_list;
 
 
 class ofxZCamE1: public ofThread, Json::Value 
 {
-    
     public:
-		bool init();
 		bool ready = false;
-		
+		bool init();
         void setup();
 
 		void threadedFunction();
-		function_list flist;
+		function_list fl;
 
 		bool loadAPI(string section); // get api structure
 
@@ -29,11 +31,12 @@ class ofxZCamE1: public ofThread, Json::Value
         
         ofxJSONElement settings; // settings
 
-		ofxJSONElement getSetting(string setting, bool thread=true); // get one setting from ZCam
-		bool sendSetting(string setting, string value, bool thread=true); // sed one setting to ZCam
-
+		ofxJSONElement getSetting(string setting, bool thread=false); // get one setting from ZCam
 		void getSettings(bool thread=true);  // get all settings from ZCam
-		void sendSettings(bool thread=true); // send all settings to ZCam		
+
+		bool sendSetting(string setting, string value, bool thread=true); // sed one setting to ZCam
+		void sendAllSettings(bool thread=true); // send all settings to ZCam		
+
 		bool saveSettings(); // save all settings from ZCam		
 		bool loadSettings(); // load saved settings to ZCam
 
@@ -49,7 +52,7 @@ class ofxZCamE1: public ofThread, Json::Value
 
     private:
         string base_url  = "http://10.98.32.1:80"; // (should be stable)
-        bool session_is_active = 0;
+        bool session_is_active = false;
         ofxJSONElement info; // info about ZCam
 
         /*  Manual Focus */
@@ -66,10 +69,5 @@ class ofxZCamE1: public ofThread, Json::Value
 };
 
 
-//~ class ofxZCamE1Settings: public ofxZCamE1
-//~ {
-	//~ public:
-		//~ void threadedFunction();    
-//~ };
 
 

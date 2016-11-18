@@ -1,28 +1,27 @@
+/* OF addon to control the Z Camera E1 through Wifi; simple example  */
+/* © Antimodular Reasearch  */
+/* Marc Lavallée, 2016/11/18  */
+
 #include "ofApp.h"
 
-//--------------------------------------------------------------
 void ofApp::setup()
 {
     ofSetWindowShape(400, 300);
-    
-    zcam.full_zoom_time = 2800; // may depend on the lens
 
 	if (! zcam.init()) {
 		ofLogFatalError("Instance of ofxZCamE1 is not ready.");
-		//~ exit();
+		exit();
 	}
+
+    zcam.full_zoom_time = 2800; // may depend on the lens
 		
     zcam.setup();
 }
-//--------------------------------------------------------------
-void ofApp::update()
-{
-	
-}
-//--------------------------------------------------------------
+
+
 void ofApp::draw()
 {
-	if (zcam.flist.empty())
+	if (zcam.fl.empty()) // not functions executing in the thread
 		ofSetBackgroundColor(ofColor(0,0,0));
 	else
 		ofSetBackgroundColor(ofColor(127,127,127));
@@ -48,7 +47,6 @@ void ofApp::draw()
 	ofxJSONElement setting;
 	ofxJSONElement settings_api = zcam.api["settings"]; 
 	ofxJSONElement keys = zcam.api["settings"]["keys"];
-	//~ string key;
     
 }
 
@@ -72,7 +70,7 @@ void ofApp::keyPressed(int key)
 			zcam.getSettings();
             break;
         case 's': // send all settings to ZCam
-			zcam.sendSettings();
+			zcam.sendAllSettings();
             break;
         case 'f': // focus to center
 			zcam.focus_at(0.5, 0.5);
