@@ -17,14 +17,18 @@ class ofxZCamE1: public ofThread, Json::Value
 		bool ready = false;
 		bool init();
         void setup();
-
+		bool firstrun = true;
+		
+		bool connection = true;
+		bool connect(bool flag);
+		
 		void threadedFunction();
 		function_list fl;
 
 		bool loadAPI(string section); // get api structure
 
         ofxJSONElement apiCall(string call); // http request to the ZCam
-        bool session(bool activate=1, bool thread=false); // session control
+        bool session(bool activate=true); // session control
         bool getInfo(); // get info about ZCam
 
         ofxJSONElement api; // api structure
@@ -41,7 +45,7 @@ class ofxZCamE1: public ofThread, Json::Value
 		bool saveSettings(); // save all settings from ZCam		
 		bool loadSettings(); // load saved settings to ZCam
 
-		/*  ev */
+		/*  Set EV, from -3.0 to 3.0 (mapping of -96 to 96) */
 		bool set_ev(float ev, bool thread=true);
 		
 		/* Focus at position */

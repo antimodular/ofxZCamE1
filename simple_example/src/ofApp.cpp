@@ -8,11 +8,6 @@ void ofApp::setup()
 {
     ofSetWindowShape(400, 350);
 
-	if (! zcam.init()) {
-		ofLogFatalError("Instance of ofxZCamE1 is not ready.");
-		exit();
-	}
-
     zcam.full_zoom_time = 2800; // may depend on the lens
     zcam.settings_skip_list = {"movfmt"}; // settings to skip (set and send)
 		
@@ -22,10 +17,15 @@ void ofApp::setup()
 
 void ofApp::draw()
 {
-	if (zcam.fl.empty()) // not functions executing in the thread
+	if (! zcam.connection)
 		ofSetBackgroundColor(ofColor(0,0,0));
-	else
-		ofSetBackgroundColor(ofColor(127,127,127));
+	else if (zcam.ready) {
+		if (zcam.fl.empty()) // not functions executing in the thread
+			ofSetBackgroundColor(ofColor(0,255,0));
+		else
+			ofSetBackgroundColor(ofColor(127,127,127));
+	} else
+		ofSetBackgroundColor(ofColor(255,0,0));
 
     stringstream info;
     info << "Simple example for the ZCamE1 addon." << endl;
@@ -45,7 +45,10 @@ void ofApp::draw()
     
     info << "Press 'w' to set ev to -3.0." << endl;
     info << "Press 'e' to set ev to 0.0." << endl;
-    info << "Press 'r' to set ev to 3.0." << endl;
+    info << "Press 'r' to set ev to 3.0.\n" << endl;
+
+    info << "Press 'c' to connect." << endl;
+    info << "Press 'd' to disconnect." << endl;
 
     ofDrawBitmapStringHighlight(info.str(), 40, 40);
 	
@@ -71,15 +74,18 @@ void ofApp::keyPressed(int key)
         case 'l': // load all saved settings
 			zcam.loadSettings();
             break;
+            
         case 'g': // get all settings from ZCam
 			zcam.getSettings();
             break;
         case 's': // send all settings to ZCam
 			zcam.sendAllSettings();
             break;
+            
         case 'f': // focus to center
 			zcam.focus_at(0.5, 0.5);
             break;
+            
         case 'y': // zoom to max
 			zcam.zoom_in(0.0);
             break;
@@ -104,6 +110,13 @@ void ofApp::keyPressed(int key)
             break;
         case 'r': // zoom to 2/3
 			zcam.set_ev(3.0);
+            break;
+            
+        case 'c': // connect
+			zcam.connect(true);
+            break;
+        case 'd': // disconnect
+			zcam.connect(false);
             break;
             
         default:

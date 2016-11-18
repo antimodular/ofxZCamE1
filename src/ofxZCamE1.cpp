@@ -7,35 +7,71 @@
 
 bool ofxZCamE1::init()
 {
-	if (this->loadAPI("settings"))
-		if (this->getInfo())
-			if (this->session())
-				this->ready = true;
+	ofLogNotice("trying to init zcam...");
+	this->ready = (
+		this->loadAPI("settings") &&
+		this->getInfo() &&
+		this->session()
+	);
    	return this->ready;
 };
 
 
 void ofxZCamE1::setup()
 {
-	if (! this->ready) {
-		ofLogFatalError("Instance of ofxZCamE1 is not ready.");
-		return;
-	}
    	this->startThread();
 };
 
 
 void ofxZCamE1::threadedFunction() {
+	int seconds = 10;
+	int lastseconds = 0;
+	
     while(isThreadRunning())
     {
-		sleep(25);
-		if (this->fl.empty()) continue;
+		sleep(25); // give the software some air
+		//~ ofLogNotice("zzz...");
+		if (! this->connection) {
+			fl.clear();
+			continue;
+		}
+		
+		if (this->firstrun) {
+			this->init();
+			this->firstrun = false;
+			continue;
+		} else
+			seconds = 10 + int(ofGetElapsedTimef());
+			
+		// activate session and auto re-init each 10 seconds, if required
+		if ( (seconds != lastseconds) && (seconds % 10) == 0 ) {
+			lastseconds = seconds;
+			//~ ofLogNotice("ping!") << seconds;
+			if (! this->session())
+				this->ready = false;
+			if (! this->ready) {
+				this->init();
+				//~ ofLogNotice("zcam ready") << this->ready;
+				if (this->ready)
+					ofLogNotice("zcam ready!");		
+			}
+		}
+		
+		if (! this->ready || this->fl.empty()) continue;
+
+		// pop a function and execute it
 		auto& f = this->fl.back();
 		f();
 		this->fl.pop_back();
-    }
+
+	}		
 };
 
+bool ofxZCamE1::connect(bool flag){
+	this->connection = flag;
+	if (this->ready)
+		this->session(this->connection);
+}
 
 bool ofxZCamE1::loadAPI(string section)
 {
@@ -91,17 +127,18 @@ bool ofxZCamE1::getInfo() {
 }
 
 
-bool ofxZCamE1::session(bool activate, bool thread) {
+bool ofxZCamE1::session(bool activate) {
 
-	if (thread) {
-		this->fl.insert(this->fl.begin(), 
-			bind(&ofxZCamE1::session, this, activate, false)
-		);
-		return true;
-	}
+	//~ if (thread) {
+		//~ this->fl.insert(this->fl.begin(), 
+			//~ bind(&ofxZCamE1::session, this, activate, false)
+		//~ );
+		//~ return true;
+	//~ }
 
 	ofxJSONElement json;
-
+	
+	
 	if (activate) {
         json = this->apiCall("/ctrl/session?action=heart_x_beat");
         this->session_is_active = (json !=null && json["code"] == 0);
@@ -109,6 +146,7 @@ bool ofxZCamE1::session(bool activate, bool thread) {
         json = this->apiCall("/ctrl/session?action=quit");
         this->session_is_active = ! (json !=null && json["code"] == 0);
     }
+    //~ ofLogNotice("session") << activate << json << this->session_is_active;
 
     if (!this->session_is_active)
 		ofLogNotice("ZCam E1 session closed.");
@@ -133,6 +171,7 @@ ofxJSONElement ofxZCamE1::getSetting(string key, bool thread)
 		);
 		return json;
 	}
+	
 	stringstream uri;
 	uri << "/ctrl/get?k=" << key;
 	json = this->apiCall(uri.str());
