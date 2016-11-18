@@ -9,7 +9,7 @@ void ofApp::setup()
     ofSetWindowShape(400, 350);
 
     zcam.full_zoom_time = 2800; // may depend on the lens
-    zcam.settings_skip_list = {"movfmt"}; // settings to skip (set and send)
+    zcam.settings_skip_list = {"video_system", "video_output"}; // settings to skip (set and send)
 		
     zcam.setup();
 }
