@@ -1,0 +1,9 @@
+{
+  "key": "lut",
+  "opts": [
+    "sRGB",
+    "Z-LOG"
+  ],
+  "ro": 0,
+  "type": 1
+}

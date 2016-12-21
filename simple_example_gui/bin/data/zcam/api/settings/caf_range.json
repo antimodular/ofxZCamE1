@@ -1,0 +1,10 @@
+{
+  "key": "caf_range",
+  "opts": [
+    "Far",
+    "Near",
+    "Normal"
+  ],
+  "ro": 0,
+  "type": 1
+}

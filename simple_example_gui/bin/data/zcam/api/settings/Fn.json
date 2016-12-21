@@ -1,0 +1,13 @@
+{
+  "key": "Fn",
+  "opts": [
+    "setting",
+    "magnify",
+    "ev",
+    "iris",
+    "focus",
+    "wifi"
+  ],
+  "ro": 0,
+  "type": 1
+}

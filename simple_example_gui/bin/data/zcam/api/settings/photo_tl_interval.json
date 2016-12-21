@@ -1,0 +1,8 @@
+{
+  "key": "photo_tl_interval",
+  "max": 1799,
+  "min": 1,
+  "ro": 0,
+  "step": 1,
+  "type": 2
+}

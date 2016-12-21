@@ -1,0 +1,9 @@
+{
+  "key": "wb",
+  "opts": [
+    "Auto",
+    "Manual"
+  ],
+  "ro": 0,
+  "type": 1
+}

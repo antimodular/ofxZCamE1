@@ -1,0 +1,9 @@
+{
+  "key": "video_output",
+  "opts": [
+    "Off",
+    "On"
+  ],
+  "ro": 1,
+  "type": 1
+}

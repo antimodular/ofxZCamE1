@@ -1,0 +1,10 @@
+{
+  "key": "flicker",
+  "opts": [
+    "Auto",
+    "60Hz",
+    "50Hz"
+  ],
+  "ro": 0,
+  "type": 1
+}

@@ -1,0 +1,9 @@
+{
+  "key": "af_mode",
+  "opts": [
+    "Normal",
+    "Selection"
+  ],
+  "ro": 0,
+  "type": 1
+}

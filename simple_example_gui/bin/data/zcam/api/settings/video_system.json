@@ -1,0 +1,9 @@
+{
+  "key": "video_system",
+  "opts": [
+    "NTSC",
+    "PAL"
+  ],
+  "ro": 0,
+  "type": 1
+}

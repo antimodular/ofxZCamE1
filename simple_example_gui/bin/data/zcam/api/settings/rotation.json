@@ -1,0 +1,9 @@
+{
+  "key": "rotation",
+  "opts": [
+    "Normal",
+    "Upside Down"
+  ],
+  "ro": 0,
+  "type": 1
+}

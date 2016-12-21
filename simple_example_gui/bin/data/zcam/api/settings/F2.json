@@ -1,0 +1,10 @@
+{
+  "key": "F2",
+  "opts": [
+    "onoff_lcd",
+    "magnify",
+    "switch_mode"
+  ],
+  "ro": 0,
+  "type": 1
+}
